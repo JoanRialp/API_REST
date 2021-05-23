@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{% static 'css/login.css' %}">
+        <link rel="stylesheet" href="{% static 'css/general.css' %}">
+    </head>
+    <header><title>LOGIN</title></header>
+    <body class="align-c font">
+    <h1 class="pagetitle">Login</h1>
+        <form method="POST">{% csrf_token %}
+            <p>Username</p>
+            <input id="uname" type="text" name="username" value="" required="required">
+            <p>Password</p>
+            <input id = "pass" type="password" name="password" value="" required="required">
+            <p></p>
+            <input class="button small" type="submit" value="SIGN IN">
+        </form>
+        <div class="line"></div>
+
+        <p class="smallfont nobottommargin">Don't have an account?</p>
+        <p class="smallfont">Go back to 
+            <span class="appcolor-t underline click" onclick="window.location.href='{{REGISTERVIEW}}'">
+             register
+            </span>
+        </p>
+    </body>
+</html>

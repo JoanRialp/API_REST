@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{% static 'css/register.css' %}">
+        <link rel="stylesheet" href="{% static 'css/general.css' %}">
+    </head>
+    <header>
+        <title>Register</title>
+    </header>
+    <body class="align-c font">
+        <h1 class="pagetitle">Register</h1>
+        <form method="POST">{% csrf_token %}
+            <p>Username</p>
+            <input id="uname" type="text" name="username" value="" required="required">
+            <p>Password</p>
+            <input id = "pass" type="password" name="password" value="" required="required">
+            <p>Email</p>
+            <input id="mail" type="email" value="" name="email" required="required">
+            <p>Name</p>
+            <input id="fname" type="text" name="firstname" value="" required="required">
+            <p>Lastname</p>
+            <input id="lnme" type="text" name="lastname" value="" required="required">
+            <p></p>
+            <input class="button" type="submit" value="REGISTER">
+        </form>
+        <div class="line"></div>
+        <p class="smallfont">Alredy have an account? 
+            <span class="appcolor-t underline click" onclick="window.location.href='{{LOGINVIEW}}'">
+                Log in
+            </span>
+        </p>
+    </body>
+</html>

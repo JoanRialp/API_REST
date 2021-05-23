@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{% static 'css/general.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <script type="application/javascript" src="{% static 'jquery-3.6.0.min.js' %}"></script>
+    </head>
+    <header>
+        <title>Pantalla Principal</title>
+    </header>
+    <body class="align-c font">
+
+        <!--NavBar-->
+        {% include "navbar.html" %}
+
+        <!--Cuerpo-->
+        <div class="container-fluid">
+            <div class="row-fluid">
+
+                <!--Barra lateral-->
+                {% include "menulateral.html" %}
+                
+              <!--Apartat central-->
+              <div class="container span9">
+                <h1 class="pagetitle">Pantalla Principal</h1>
+                <div class="line"></div>
+
+                <!--Per poder crear Tweets-->
+                <div class="profile-info col-md-12">
+                    <div class="panel">
+                        <form method="POST" style="width: 100%; height: 200px;">{% csrf_token %}
+                            <input id="textarea_post" type="text" name="textarea" value="" style="height: 100%;">
+                            <input id="submitPublicacion" class="button small" hidden="hidden" type="submit" value="Post2">
+                        </form>
+                        <footer class="panel-footer">
+                            <button id="buttonSubmitPublicacion" type="submit" class="btn btn-warning pull-right">Post</button>
+                            <ul class="nav nav-pills">
+                                <li><a href="#"><i class="fa fa-map-marker"></i></a></li>
+                                <li><a href="#"><i class="fa fa-camera"></i></a></li>
+                                <li><a href="#"><i class=" fa fa-film"></i></a></li>
+                                <li><a href="#"><i class="fa fa-microphone"></i></a></li>
+                            </ul>
+                        </footer>
+                    </div>
+                </div>
+
+                <h2> Tweets</h2>
+                <button class="ver_Tweets"> Ver Tweets </button>
+
+                <div class="row-fluid">
+                    <div id="contanidorPublicacionesListado"></div>
+                </div>
+              </div>
+            </div>
+            <hr>
+        </div>
+    </body>
+
+    <script>
+         //DELETE
+         $(document).on('click', '.button_Eliminar_Publicacion', function(e){
+            var id_publicacion = e.target.attributes.id_publicacion.textContent;
+
+            $.ajax({
+                    url : "/principal_Rest/",
+                    type : 'DELETE',
+                    data:{id: id_publicacion},
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success : function (result) {
+                        //alert('Publicacion eliminada');
+                        window.location.reload();
+                    },
+                    error : function(xhr, status) {
+                        alert('Error: ', status, xhr);
+                    }
+            });
+        });
+
+        //PUT
+        $(document).on('click', '.button_Cambiar_Publicacion', function(e){
+            var id_publicacion = e.target.attributes.id_publicacion.textContent;
+            var textarea = document.getElementById(id_publicacion);
+
+            $.ajax({
+                    url : "/principal_Rest/",
+                    type : 'PUT',
+                    data:{id: id_publicacion, id_user: textarea.attributes.id_usuario.value, 
+                        name_user: textarea.attributes.username.value, description: textarea.value},
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success : function (result) {
+                        //alert('Publicacion cambiada');
+                        window.location.reload();
+                    },
+                    error : function(xhr, status) {
+                        alert('Error: ', status, xhr);
+                    }
+            });
+        });
+
+        //POST
+        $('#buttonSubmitPublicacion').click(function(e){
+            var username = "{{ User.username }}";
+            var id_user = "{{ User.id }}";
+
+            var textarea_post = document.getElementById("textarea_post");
+            let publicacion =  textarea_post.value;
+            
+            $.ajax({
+                    url : "/principal_Rest/",
+                    type : 'POST',
+                    data:{id_user: id_user, name_user: username, description: publicacion},
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success : function (result) {
+                        //alert('Publicacion publicada');
+                        window.location.reload();
+                    },
+                    error : function(xhr, status) {
+                        alert('Error: ', status, xhr);
+                    }
+            });
+        });
+
+        //GET
+        $(document).ready(function() {
+            var id_user = "{{ User.id }}";
+
+            $.ajax({
+                    url : "/principal_Rest/",
+                    type : 'GET',
+                    dataType: "json",
+                    success : function (data) {
+                        var contanidorPublicacionesListado = document.getElementById("contanidorPublicacionesListado");
+
+                        for(let i = 0; i < data.length; i++)
+                        {
+                            let div = document.createElement("div");
+                            div.className = "well span4";
+                            div.style = "text-align: left";
+
+                            let nombre_usuario = document.createElement("h3");
+                            nombre_usuario.style.display = "inline";
+                            nombre_usuario.textContent = data[i].name_user;
+ 
+                            div.appendChild(nombre_usuario);
+
+                            if(id_user == data[i].id_user)
+                            {
+                                let descripcion_me = document.createElement("input");
+                                descripcion_me.id = data[i].id
+                                descripcion_me.type = "text";
+                                descripcion_me.value = data[i].description;
+                                descripcion_me.setAttribute("id_usuario", data[i].id_user);
+                                descripcion_me.setAttribute("username", data[i].name_user);
+
+                                let button_Eliminar = document.createElement("button");
+                                button_Eliminar.type = "button";
+                                button_Eliminar.classList.add("btn");
+                                button_Eliminar.classList.add("btn-danger");
+                                button_Eliminar.classList.add("pull-right");
+                                button_Eliminar.textContent = "Eliminar";
+                                button_Eliminar.style.margin = "10px";
+                                button_Eliminar.classList.add("button_Eliminar_Publicacion");
+                                button_Eliminar.setAttribute("id_publicacion", data[i].id);
+
+                                let button_Cambiar = document.createElement("button");
+                                button_Cambiar.type = "submit";
+                                button_Cambiar.classList.add("btn");
+                                button_Cambiar.classList.add("btn-info");
+                                button_Cambiar.classList.add("pull-right");
+                                button_Cambiar.textContent = "Editar";
+                                button_Cambiar.style.margin = "10px";
+                                button_Cambiar.classList.add("button_Cambiar_Publicacion");
+                                button_Cambiar.setAttribute("id_publicacion", data[i].id);
+
+                                div.appendChild(button_Eliminar);
+                                div.appendChild(button_Cambiar);
+                                div.appendChild(descripcion_me);
+                            }
+                            else{
+                                let descripcion_usuario = document.createElement("p");
+                                descripcion_usuario.textContent = data[i].description;
+                                div.appendChild(descripcion_usuario);
+                            }
+
+                            contanidorPublicacionesListado.appendChild(div);
+                        }  
+
+                        var ver_Tweets = document.getElementsByClassName("ver_Tweets");
+                        ver_Tweets[0].setAttribute("hidden", "hidden");
+
+                        //alert('Lista Publicaciones');
+                    },
+                    error : function(xhr, status) {
+                        alert('Error: ', status);
+                    }
+                });
+        }); 
+
+    </script>
+</html>

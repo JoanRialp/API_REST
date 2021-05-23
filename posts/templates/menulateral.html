@@ -1,0 +1,73 @@
+
+<!--Barra lateral-->
+<div class="span3" style="float: left; height: 100vh;">
+    <div class="well sidebar-nav" style="height: 100%;">
+        <ul class="nav nav-list">
+            <li class="nav-header">Usuarios a seguir:</li>
+            <div id="contanidorFollowingsListado"></div>
+        </ul>
+    </div>
+</div>
+
+<script>
+    //POST
+    $(document).on('click', '.button_Seguir_Usuario', function(e){  
+        var id_user = "{{ User.id }}";
+   
+        $.ajax({
+                url : "/manuLateral_Rest/",
+                type : 'POST',
+                data:{id_user: id_user, id_UserFlollowing:  e.target.attributes.id_Usuario.textContent},
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
+                success : function (result) {
+                    alert('Seguir Usuario');
+                    window.location.reload();
+                },
+                error : function(xhr, status) {
+                    alert('Error: ', status, xhr);
+                }
+        });
+    });
+
+    //GET
+    $(document).ready(function() {
+        $.ajax({
+                url : "/manuLateral_Rest/",
+                type : 'GET',
+                dataType: "json",
+                success : function (data) {
+                    var contanidorFollowingsListado = document.getElementById("contanidorFollowingsListado");
+
+                    for(let i = 0; i < data.length; i++)
+                    {
+                        let nombre_usuario = document.createElement("h3");
+                        nombre_usuario.style.display = "inline";
+                        nombre_usuario.textContent = data[i].username;
+
+                        let button_Seguir = document.createElement("button");
+                            button_Seguir.type = "submit";
+                            button_Seguir.classList.add("btn");
+                            button_Seguir.classList.add("btn-info");
+                            button_Seguir.textContent = "Seguir";
+                            button_Seguir.style.margin = "10px";
+                            button_Seguir.classList.add("button_Seguir_Usuario");
+                            button_Seguir.setAttribute("id_Usuario", data[i].id);
+
+                        contanidorFollowingsListado.appendChild(nombre_usuario);
+                        contanidorFollowingsListado.appendChild(button_Seguir);
+
+                        let br = document.createElement("br");
+                        contanidorFollowingsListado.appendChild(br);
+                    }  
+                    //alert('Lista Followings');
+                },
+                error : function(xhr, status) {
+                    alert('Error: ', status);
+                }
+            });
+    }); 
+
+</script>
+            

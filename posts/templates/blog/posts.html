@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <header><title>Home</title></header>
+    <body>
+        <h1>POSTS BY USERS</h1>
+        {% for post in postlist %}
+            <p>{{ post }}</p>
+        {% endfor %}
+    </body>
+    
+
+    <form action ="https://www.google.com/search" method="GET" > 
+        <input id="username" type="text" name="q" value="">
+        <input type="submit" value="OK">
+    </form>
+</html>
